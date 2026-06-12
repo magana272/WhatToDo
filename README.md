@@ -56,9 +56,8 @@ A user wants to plan activities for the weekend.
 
 1. The user fills in UI fields such as location, time range, and indoor/outdoor preference.
 2. The system retrieves relevant events and activities using event APIs and map services.
-3. The system ranks results based on distance, schedule compatibility, and user preferences.
-4. The system generates a suggested itinerary.
-5. The user downloads the plan as an ICS file or saves it.
+3. The system generates a suggested itinerary.
+4. The user downloads the plan as an ICS file or saves it.
 
 ### Outcome
 
@@ -74,7 +73,6 @@ The system includes the following components:
 - AI intent detection and response generation  
 - Activity and event retrieval from external sources  
 - Data normalization into a consistent activity format  
-- Ranking and filtering based on user preferences and constraints  
 - Itinerary generation  
 - Calendar schedule export as an ICS file  
 
@@ -122,7 +120,7 @@ The application integrates with external services including:
 ## Non-Functional Requirements
 
 ### Performance
-Results should be generated within **5–10 seconds**, depending on external API response times.
+Results should be generated within **45 seconds**, depending on external API response times.
 
 ### Reliability
 The system should handle failed API calls gracefully and return partial results when possible.
@@ -152,7 +150,7 @@ Deployment and final documentation/demo
 **Total Estimated Time:** 9 weeks
 
 # Deployment Details
-The application API is hosted on AWS apprunner, and the frontend is hosted on Vercel. The backend API is accessible at `https://bmjumiukye.us-east-1.awsapprunner.com/`, and the frontend is accessible at `https://what-to-do-app-two.vercel.app/`. The database is hosted on AWS RDS, and the email service is configured using AWS SES.
+The application API is hosted on AWS apprunner, and the frontend is hosted on Vercel. The backend API is accessible at `https://mk2tba6npp.us-east-1.awsapprunner.com`, and the frontend is accessible at `https://cs-5500-final-project-seven.vercel.app/`. The database is hosted on AWS RDS, and the email service is configured using AWS SES.
 
 
 

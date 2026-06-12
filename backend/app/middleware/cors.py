@@ -15,6 +15,8 @@ origins = [
     "https://cs-5500-final-project-ybji-git-main-manuel-magana-devs-projects.vercel.app",
     "https://what-to-do-app-two.vercel.app",
     "https://vercel.live",
+    "https://cs-5500-final-project-guw0aqwgw-shiqius-projects.vercel.app",
+    "https://cs-5500-final-project-seven.vercel.app"
 ]
 
 def add_cors_middleware(app: FastAPI):

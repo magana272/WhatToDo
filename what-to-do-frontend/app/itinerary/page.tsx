@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "./page.module.css";
 import { useAuth } from "../contexts/AuthContext";
 
-// All client-side fetches go through the Next.js rewrite proxy at /api/*.
-const API_BASE_URL = "/api";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  "https://mk2tba6npp.us-east-1.awsapprunner.com";
+const ITINERARY_STORAGE_KEY = "planner_home_itinerary";
 
 type HistoryItem = {
   id: string;
@@ -14,6 +16,7 @@ type HistoryItem = {
   location: string;
   summary: string;
   preference: "Indoor" | "Outdoor" | "Mixed";
+  time?: string;
 };
 
 type SavedEventApiItem = {
@@ -50,6 +53,174 @@ function mapTagToPreference(tag: string): "Indoor" | "Outdoor" | "Mixed" {
   }
 
   return "Mixed";
+}
+
+function removeDeletedItemFromHomeCache(deletedItemId: string) {
+  try {
+    const raw = sessionStorage.getItem(ITINERARY_STORAGE_KEY);
+
+    if (!raw) {
+      return;
+    }
+
+    const parsed = JSON.parse(raw);
+
+    const nextSavedRecordIds = { ...(parsed.savedRecordIds ?? {}) };
+
+    Object.keys(nextSavedRecordIds).forEach((activityId) => {
+      if (String(nextSavedRecordIds[activityId]) === deletedItemId) {
+        delete nextSavedRecordIds[activityId];
+      }
+    });
+
+    const nextSavedActivityIds = (parsed.savedActivityIds ?? []).filter(
+      (activityId: string) => nextSavedRecordIds[activityId] !== undefined,
+    );
+
+    sessionStorage.setItem(
+      ITINERARY_STORAGE_KEY,
+      JSON.stringify({
+        ...parsed,
+        savedActivityIds: nextSavedActivityIds,
+        savedRecordIds: nextSavedRecordIds,
+      }),
+    );
+  } catch (error) {
+    console.error("Failed to sync home page cache:", error);
+  }
+}
+
+function pad(value: number) {
+  return String(value).padStart(2, "0");
+}
+
+function parseTimeTo24Hour(time?: string) {
+  if (!time || !time.trim()) {
+    return { hour: 9, minute: 0 };
+  }
+
+  const raw = time.trim().toLowerCase();
+
+  const ampmMatch = raw.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)/i);
+  if (ampmMatch) {
+    let hour = Number(ampmMatch[1]);
+    const minute = Number(ampmMatch[2] ?? "0");
+    const meridiem = ampmMatch[3].toLowerCase();
+
+    if (meridiem === "pm" && hour !== 12) {
+      hour += 12;
+    }
+
+    if (meridiem === "am" && hour === 12) {
+      hour = 0;
+    }
+
+    return { hour, minute };
+  }
+
+  const twentyFourHourMatch = raw.match(/(\d{1,2}):(\d{2})/);
+  if (twentyFourHourMatch) {
+    return {
+      hour: Number(twentyFourHourMatch[1]),
+      minute: Number(twentyFourHourMatch[2]),
+    };
+  }
+
+  const hourOnlyMatch = raw.match(/\b(\d{1,2})\b/);
+  if (hourOnlyMatch) {
+    return {
+      hour: Number(hourOnlyMatch[1]),
+      minute: 0,
+    };
+  }
+
+  // Fallback
+  return { hour: 9, minute: 0 };
+}
+
+function createLocalDate(date: string, time?: string) {
+  const parts = date.split("-").map(Number);
+
+  if (parts.length !== 3 || parts.some(Number.isNaN)) {
+    throw new Error(`Invalid date: ${date}`);
+  }
+
+  const [year, month, day] = parts;
+  const { hour, minute } = parseTimeTo24Hour(time);
+
+  return new Date(year, month - 1, day, hour, minute, 0);
+}
+
+function toICSDateTime(date: Date) {
+  return (
+    `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}` +
+    `T${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
+  );
+}
+
+function escapeICS(text: string) {
+  return text
+    .replace(/\\/g, "\\\\")
+    .replace(/\n/g, "\\n")
+    .replace(/,/g, "\\,")
+    .replace(/;/g, "\\;");
+}
+
+function downloadICS(item: HistoryItem) {
+  try {
+    const startDate = createLocalDate(item.date, item.time);
+
+    if (Number.isNaN(startDate.getTime())) {
+      throw new Error("Invalid start date");
+    }
+
+    const endDate = new Date(startDate);
+    endDate.setHours(endDate.getHours() + 2);
+
+    const uid = `saved-${item.id}@planner`;
+    const dtstamp = new Date()
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace(/\.\d{3}Z/, "Z");
+
+    const lines = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "CALSCALE:GREGORIAN",
+      "METHOD:PUBLISH",
+      "PRODID:-//Planner App//Saved Itinerary//EN",
+      "BEGIN:VEVENT",
+      `UID:${uid}`,
+      `DTSTAMP:${dtstamp}`,
+      `DTSTART:${toICSDateTime(startDate)}`,
+      `DTEND:${toICSDateTime(endDate)}`,
+      `SUMMARY:${escapeICS(item.title)}`,
+      `LOCATION:${escapeICS(item.location)}`,
+      `DESCRIPTION:${escapeICS(`${item.title} at ${item.location}`)}`,
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ];
+
+    const blob = new Blob([lines.join("\r\n")], {
+      type: "text/calendar;charset=utf-8",
+    });
+
+    const safeFileName = item.title
+      .replace(/[^\w\s-]/g, "")
+      .trim()
+      .replace(/\s+/g, "-");
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${safeFileName || "event"}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+  } catch (error) {
+    console.error("Failed to generate ICS:", error);
+    alert("This event has an invalid date or time format.");
+  }
 }
 
 export default function ItineraryPage() {
@@ -91,6 +262,7 @@ export default function ItineraryPage() {
           location: item.location,
           summary: `${item.time} • ${item.tag} • ${item.price}`,
           preference: mapTagToPreference(item.tag),
+          time: item.time,
         }));
 
         setItems(mappedItems);
@@ -136,6 +308,7 @@ export default function ItineraryPage() {
       }
 
       setItems((prev) => prev.filter((item) => item.id !== itemId));
+      removeDeletedItemFromHomeCache(itemId);
     } catch (error) {
       console.error("Failed to delete itinerary:", error);
       alert("Something went wrong while deleting the itinerary.");
@@ -146,10 +319,12 @@ export default function ItineraryPage() {
 
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
+      const query = search.toLowerCase();
+
       const matchesSearch =
-        item.title.toLowerCase().includes(search.toLowerCase()) ||
-        item.location.toLowerCase().includes(search.toLowerCase()) ||
-        item.summary.toLowerCase().includes(search.toLowerCase());
+        item.title.toLowerCase().includes(query) ||
+        item.location.toLowerCase().includes(query) ||
+        item.summary.toLowerCase().includes(query);
 
       const matchesPreference =
         preferenceFilter === "All" || item.preference === preferenceFilter;
@@ -246,14 +421,24 @@ export default function ItineraryPage() {
                         <p className={styles.summary}>{item.summary}</p>
                       </div>
 
-                      <button
-                        type="button"
-                        className={styles.deleteButton}
-                        onClick={() => handleDeleteItinerary(item.id)}
-                        disabled={isDeleting}
-                      >
-                        {isDeleting ? "Deleting..." : "Delete"}
-                      </button>
+                      <div className={styles.cardActions}>
+                        <button
+                          type="button"
+                          className={styles.downloadButton}
+                          onClick={() => downloadICS(item)}
+                        >
+                          Download ICS
+                        </button>
+
+                        <button
+                          type="button"
+                          className={styles.deleteButton}
+                          onClick={() => handleDeleteItinerary(item.id)}
+                          disabled={isDeleting}
+                        >
+                          {isDeleting ? "Deleting..." : "Delete"}
+                        </button>
+                      </div>
                     </div>
 
                     <div className={styles.metaRow}>

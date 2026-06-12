@@ -5,7 +5,9 @@ import type { ChangeEvent, FormEvent } from "react";
 import styles from "./page.module.css";
 import { useAuth } from "./contexts/AuthContext";
 
-const API_BASE_URL = "/api";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  "https://mk2tba6npp.us-east-1.awsapprunner.com";
 const ITINERARY_STORAGE_KEY = "planner_home_itinerary";
 
 const features = [

@@ -7,8 +7,8 @@ from anthropic import Anthropic
 from app.core.config import settings, BACKEND_DIR
 from app.schemas.events import EventRequest, Event
 
-PROMPT_PATH = BACKEND_DIR / "prompts" / "prompt.txt"
-VALIDATION_PROMPT_PATH = BACKEND_DIR / "prompts" / "validation_prompt.txt"
+PROMPT_PATH = BACKEND_DIR / "app" / "prompts" / "prompt.txt"
+VALIDATION_PROMPT_PATH = BACKEND_DIR / "app" / "prompts" / "validation_prompt.txt"
 
 
 class EventRecommendationService(ABC):

@@ -87,7 +87,7 @@ class TestOpenAIRecommendationService:
         service = OpenAIRecommendationService()
         service.get_recommendations(EventRequest(city="NYC", interests="jazz"))
         call_kwargs = mock_openai_client.responses.create.call_args
-        assert call_kwargs.kwargs["model"] == "gpt-4o"
+        assert call_kwargs.kwargs["model"] == "gpt-5.4-mini"
 
     def test_enables_web_search(self, mock_openai_client):
         mock_openai_client.responses.create.return_value = _mock_response(

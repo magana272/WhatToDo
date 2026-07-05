@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field
 
-from enum import Enum
 class EventRequest(BaseModel):
     city: str = Field(..., description="City to search events in")
     interests: str = Field(..., description="User interests or event type")

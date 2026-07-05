@@ -1,6 +1,5 @@
 """Tests for the events recommendation router."""
 
-import json
 from unittest.mock import MagicMock
 
 import pytest
@@ -66,17 +65,17 @@ class TestEventsEndpoint:
         assert data[0]["name"] == "Jazz Night"
         assert data[0]["estimated_cost"] == 25.0
 
-    def test_defaults_to_claude_provider(self, client):
+    def test_defaults_to_openai_provider(self, client):
         tc, mock_openai, mock_claude = client
         tc.post("/events/recommendations", json=VALID_REQUEST)
-        mock_claude.get_recommendations.assert_called_once()
-        mock_openai.get_recommendations.assert_not_called()
-
-    def test_openai_provider(self, client):
-        tc, mock_openai, mock_claude = client
-        tc.post("/events/recommendations?provider=openai", json=VALID_REQUEST)
         mock_openai.get_recommendations.assert_called_once()
         mock_claude.get_recommendations.assert_not_called()
+
+    def test_claude_provider(self, client):
+        tc, mock_openai, mock_claude = client
+        tc.post("/events/recommendations?provider=claude", json=VALID_REQUEST)
+        mock_claude.get_recommendations.assert_called_once()
+        mock_openai.get_recommendations.assert_not_called()
 
     def test_invalid_provider_returns_422(self, client):
         tc, _, _ = client
@@ -91,14 +90,14 @@ class TestEventsEndpoint:
         assert response.status_code == 422
 
     def test_service_error_returns_500(self, client):
-        tc, _, mock_claude = client
-        mock_claude.get_recommendations.side_effect = Exception("API failure")
+        tc, mock_openai, _ = client
+        mock_openai.get_recommendations.side_effect = Exception("API failure")
         response = tc.post("/events/recommendations", json=VALID_REQUEST)
         assert response.status_code == 500
         assert "API failure" in response.json()["detail"]
 
     def test_optional_fields_passed_through(self, client):
-        tc, _, mock_claude = client
+        tc, mock_openai, _ = client
         full_request = {
             "city": "Boston",
             "interests": "food",
@@ -106,7 +105,7 @@ class TestEventsEndpoint:
             "date_range": "2026-03-15 to 2026-03-20",
         }
         tc.post("/events/recommendations", json=full_request)
-        call_args = mock_claude.get_recommendations.call_args
+        call_args = mock_openai.get_recommendations.call_args
         req = call_args[0][0]
         assert req.city == "Boston"
         assert req.budget == 50.0

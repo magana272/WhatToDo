@@ -13,7 +13,7 @@ claude_service = ClaudeRecommendationService()
 
 class PlannerRecommendationService:
     """Service to generate a day plan based on user preferences."""
-    def __init__(self, provider: str = "claude"):
+    def __init__(self, provider: str = "openai"):
         if provider == "openai":
             self._client = openai_service
         else:

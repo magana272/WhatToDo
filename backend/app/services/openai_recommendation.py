@@ -32,7 +32,7 @@ class OpenAIRecommendationService(EventRecommendationService):
         print("Calling OpenAI responses.create", flush=True)
         try:
             response = self._client.responses.create(
-                model="gpt-4o",
+                model="gpt-5.4-mini",
                 tools=[{"type": "web_search_preview"}],
                 instructions=self._system_prompt,
                 input=user_message,

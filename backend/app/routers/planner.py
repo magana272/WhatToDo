@@ -19,7 +19,7 @@ router = APIRouter()
 def recommend_events(
     request: PlannerRequest,
     provider: Literal["openai", "claude"] = Query(
-        "claude", description="Choose the recommendation provider"),
+        "openai", description="Choose the recommendation provider"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -37,7 +37,7 @@ def recommend_events(
         title=result.title,
         date=result.date,
         city=result.city,
-        summary=result.summary,
+        summary=result.summary, 
     )
     db.add(planner)
     db.flush()

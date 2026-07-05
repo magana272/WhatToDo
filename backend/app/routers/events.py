@@ -15,7 +15,7 @@ claude_service = ClaudeRecommendationService()
 @router.post("/events/recommendations", response_model=list[Event])
 def recommend_events(
     request: EventRequest,
-    provider: Literal["openai", "claude"] = Query("claude", description="Choose the recommendation provider"),
+    provider: Literal["openai", "claude"] = Query("openai", description="Choose the recommendation provider"),
 ):
     """Generate event recommendations using OpenAI or Claude."""
     service = openai_service if provider == "openai" else claude_service

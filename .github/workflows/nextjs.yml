@@ -75,6 +75,7 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
         env:
           GITHUB_PAGES: "true"
+          NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

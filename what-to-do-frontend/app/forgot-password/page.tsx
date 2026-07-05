@@ -3,9 +3,10 @@
 import { useState } from "react";
 import type { FormEvent, ChangeEvent } from "react";
 import Link from "next/link";
+import { API_BASE_URL } from "../lib/api";
 import styles from "./page.module.css";
 
-const FORGOT_PASSWORD_ENDPOINT = "/api/auth/forgot-password";
+const FORGOT_PASSWORD_ENDPOINT = `${API_BASE_URL}/auth/forgot-password`;
 const FETCH_TIMEOUT_MS = 12_000;
 
 export default function ForgotPasswordPage() {

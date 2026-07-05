@@ -6,17 +6,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 origins = [
-    "http://localhost",
-    "http://localhost:8080",
     "http://localhost:3000",
-    "http://localhost:3002",
-    "https://cs-5500-final-project-ybji.vercel.app",
-    "https://cs-5500-final-project-ybji-manuel-magana-devs-projects.vercel.app",
-    "https://cs-5500-final-project-ybji-git-main-manuel-magana-devs-projects.vercel.app",
-    "https://what-to-do-app-two.vercel.app",
-    "https://vercel.live",
-    "https://cs-5500-final-project-guw0aqwgw-shiqius-projects.vercel.app",
-    "https://cs-5500-final-project-seven.vercel.app"
+    "https://magana272.github.io"
 ]
 
 def add_cors_middleware(app: FastAPI):

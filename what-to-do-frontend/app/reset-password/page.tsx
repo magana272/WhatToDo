@@ -4,9 +4,10 @@ import { useState, Suspense } from "react";
 import type { FormEvent, ChangeEvent } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { API_BASE_URL } from "../lib/api";
 import styles from "./page.module.css";
 
-const RESET_PASSWORD_ENDPOINT = "/api/auth/reset-password";
+const RESET_PASSWORD_ENDPOINT = `${API_BASE_URL}/auth/reset-password`;
 const FETCH_TIMEOUT_MS = 12_000;
 
 function ResetPasswordForm() {

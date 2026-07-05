@@ -29,28 +29,28 @@ function matchRoute(
   method: string,
 ): MockResponse | null {
   // --- Auth ---
-  if (url.includes("/api/auth/login") && method === "POST") {
+  if (url.includes("/auth/login") && method === "POST") {
     return {
       status: 200,
       body: { access_token: mockAccessToken, user: mockUser },
     };
   }
 
-  if (url.includes("/api/auth/register") && method === "POST") {
+  if (url.includes("/auth/register") && method === "POST") {
     return {
       status: 200,
       body: { access_token: mockAccessToken, user: mockUser },
     };
   }
 
-  if (url.includes("/api/auth/forgot-password") && method === "POST") {
+  if (url.includes("/auth/forgot-password") && method === "POST") {
     return {
       status: 200,
       body: { message: "Password reset email sent." },
     };
   }
 
-  if (url.includes("/api/auth/reset-password") && method === "POST") {
+  if (url.includes("/auth/reset-password") && method === "POST") {
     return {
       status: 200,
       body: { message: "Password has been reset successfully." },

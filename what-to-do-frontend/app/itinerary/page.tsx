@@ -3,10 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "./page.module.css";
 import { useAuth } from "../contexts/AuthContext";
+import { API_BASE_URL } from "../lib/api";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ??
-  "https://mk2tba6npp.us-east-1.awsapprunner.com";
 const ITINERARY_STORAGE_KEY = "planner_home_itinerary";
 
 type HistoryItem = {

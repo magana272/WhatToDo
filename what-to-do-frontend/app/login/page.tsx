@@ -5,10 +5,10 @@ import type { FormEvent, ChangeEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../contexts/AuthContext";
+import { API_BASE_URL } from "../lib/api";
 import styles from "./page.module.css";
 
-// Route through Next.js proxy to avoid browser-side CORS issues.
-const LOGIN_ENDPOINT = "/api/auth/login";
+const LOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
 const FETCH_TIMEOUT_MS = 12_000;
 
 export default function LoginPage() {

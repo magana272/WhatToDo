@@ -5,10 +5,10 @@ import type { FormEvent, ChangeEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../contexts/AuthContext";
+import { API_BASE_URL } from "../lib/api";
 import styles from "./page.module.css";
 
-// Route through Next.js proxy to avoid browser-side CORS issues.
-const SIGNUP_ENDPOINT = "/api/auth/register";
+const SIGNUP_ENDPOINT = `${API_BASE_URL}/auth/register`;
 
 const INTEREST_OPTIONS = [
   "Food & dining",

@@ -38,6 +38,10 @@ jobs:
 
     - name: Test
       run: pytest
+      env:
+        OPENAI_API_KEY: ${{ vars.OPENAI_API_KEY }}
+        CLAUDE_API_KEY: ${{ vars.CLAUDE_API_KEY }}
+        SECRET_KEY: ${{ vars.SECRET_KEY }}
 
   frontend:
     name: Frontend lint

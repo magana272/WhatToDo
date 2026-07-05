@@ -5,6 +5,7 @@ const rawApiBase =
 const normalizedApiBase = rawApiBase.replace(/\/+$/, "");
 
 const isGithubPages = process.env.GITHUB_PAGES === "true";
+const repoName = process.env.GITHUB_REPOSITORY?.split("/")[1];
 
 const nextConfig: NextConfig = {
   crossOrigin: "anonymous",
@@ -12,7 +13,7 @@ const nextConfig: NextConfig = {
   ...(isGithubPages
     ? {
         output: "export" as const,
-        basePath: "/CS5500-final-project",
+        basePath: repoName ? `/${repoName}` : "",
         images: { unoptimized: true },
       }
     : {

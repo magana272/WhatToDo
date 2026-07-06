@@ -135,6 +135,35 @@
   gap: 18px;
 }
 
+.fieldError {
+  margin: 0;
+  color: #dc2626;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.timeField {
+  position: relative;
+}
+
+.timeField input {
+  width: 100%;
+  padding-right: 44px;
+}
+
+.timeField input::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+.timeIcon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  pointer-events: none;
+}
+
 .formActions {
   display: flex;
   gap: 14px;

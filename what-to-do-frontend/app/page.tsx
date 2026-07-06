@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import styles from "./page.module.css";
 import { useAuth } from "./contexts/AuthContext";
+import LocationAutocomplete from "./components/LocationAutocomplete";
+import { formatPlace, pickMatch, searchPlaces } from "./lib/geocoding";
 import { API_BASE_URL } from "./lib/api";
 
 const ITINERARY_STORAGE_KEY = "planner_home_itinerary";
@@ -18,7 +20,8 @@ const features = [
 type PlannerFormData = {
   location: string;
   date: string;
-  timeRange: string;
+  startTime: string;
+  endTime: string;
   budget: string;
   preference: string;
   interests: string;
@@ -87,12 +90,14 @@ type PersistedHomeState = {
   result: ItineraryResponse | null;
   savedActivityIds: string[];
   savedRecordIds: Record<string, number>;
+  locationValid?: boolean;
 };
 
 const initialFormData: PlannerFormData = {
   location: "",
   date: "",
-  timeRange: "",
+  startTime: "09:00",
+  endTime: "18:00",
   budget: "",
   preference: "Mixed",
   interests: "",
@@ -108,27 +113,16 @@ function getAuthHeaders(token: string | null): Record<string, string> {
   };
 }
 
-function parseTimeRange(timeRange: string) {
-  const [rawStart = "", rawEnd = ""] = timeRange.split("-");
-
-  return {
-    dayStartTime: rawStart.trim(),
-    dayEndTime: rawEnd.trim(),
-  };
-}
-
 function buildRecommendationPayload(
   formData: PlannerFormData,
 ): PlannerRequestPayload {
-  const { dayStartTime, dayEndTime } = parseTimeRange(formData.timeRange);
-
   return {
     city: formData.location.trim(),
     interests: formData.interests.trim(),
     budget: formData.budget === "" ? 0 : Number(formData.budget),
     dateRange: formData.date,
-    dayStartTime,
-    dayEndTime,
+    dayStartTime: formData.startTime,
+    dayEndTime: formData.endTime,
   };
 }
 
@@ -160,6 +154,28 @@ function buildResult(
   };
 }
 
+function ClockIcon() {
+  return (
+    <svg
+      className={styles.timeIcon}
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+      />
+    </svg>
+  );
+}
+
 export default function HomePage() {
   const { isLoggedIn, isLoading, token } = useAuth();
 
@@ -171,6 +187,9 @@ export default function HomePage() {
     {},
   );
   const [hasHydrated, setHasHydrated] = useState(false);
+  const [locationValid, setLocationValid] = useState(false);
+  const [locationError, setLocationError] = useState("");
+  const [isValidatingLocation, setIsValidatingLocation] = useState(false);
 
   useEffect(() => {
     try {
@@ -183,10 +202,15 @@ export default function HomePage() {
 
       const parsed: PersistedHomeState = JSON.parse(raw);
 
-      setFormData(parsed.formData ?? initialFormData);
+      const restoredFormData = parsed.formData ?? initialFormData;
+
+      setFormData(restoredFormData);
       setResult(parsed.result ?? null);
       setSavedActivityIds(parsed.savedActivityIds ?? []);
       setSavedRecordIds(parsed.savedRecordIds ?? {});
+      setLocationValid(
+        parsed.locationValid ?? Boolean(restoredFormData.location.trim()),
+      );
     } catch (error) {
       console.error("Failed to restore itinerary from sessionStorage:", error);
       sessionStorage.removeItem(ITINERARY_STORAGE_KEY);
@@ -203,10 +227,18 @@ export default function HomePage() {
       result,
       savedActivityIds,
       savedRecordIds,
+      locationValid,
     };
 
     sessionStorage.setItem(ITINERARY_STORAGE_KEY, JSON.stringify(data));
-  }, [hasHydrated, formData, result, savedActivityIds, savedRecordIds]);
+  }, [
+    hasHydrated,
+    formData,
+    result,
+    savedActivityIds,
+    savedRecordIds,
+    locationValid,
+  ]);
 
   function handleChange(
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -225,11 +257,60 @@ export default function HomePage() {
     return `$${price}`;
   }
 
+  async function resolveLocation(): Promise<string | null> {
+    const typed = formData.location.trim();
+
+    if (!typed) {
+      setLocationError("Please enter a location.");
+      return null;
+    }
+
+    if (locationValid) {
+      return typed;
+    }
+
+    setIsValidatingLocation(true);
+
+    try {
+      const results = await searchPlaces(typed);
+      const match = pickMatch(results, typed);
+
+      if (!match) {
+        setLocationError(
+          "That location doesn't seem to exist. Pick one from the suggestions.",
+        );
+        return null;
+      }
+
+      const label = formatPlace(match);
+      setFormData((prev) => ({ ...prev, location: label }));
+      setLocationValid(true);
+      return label;
+    } catch (error) {
+      console.error("Location validation error:", error);
+      setLocationError("Couldn't verify that location. Please try again.");
+      return null;
+    } finally {
+      setIsValidatingLocation(false);
+    }
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setLocationError("");
+
+    const resolvedLocation = await resolveLocation();
+
+    if (!resolvedLocation) {
+      return;
+    }
+
     setIsSubmitting(true);
 
-    const payload = buildRecommendationPayload(formData);
+    const payload = buildRecommendationPayload({
+      ...formData,
+      location: resolvedLocation,
+    });
 
     try {
       const response = await fetch(
@@ -391,39 +472,71 @@ export default function HomePage() {
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.fieldGroup}>
               <label htmlFor="location">Location</label>
-              <input
+              <LocationAutocomplete
                 id="location"
                 name="location"
-                type="text"
-                placeholder="Enter city or area"
+                placeholder="Enter a city (e.g. San Francisco)"
                 value={formData.location}
+                onValueChange={(value) => {
+                  setFormData((prev) => ({ ...prev, location: value }));
+                  setLocationError("");
+                }}
+                onValidChange={setLocationValid}
+              />
+              {locationError ? (
+                <p className={styles.fieldError}>{locationError}</p>
+              ) : (
+                locationValid &&
+                formData.location.trim() !== "" && (
+                  <p className={styles.fieldHint}>✓ Verified location</p>
+                )
+              )}
+            </div>
+
+            <div className={styles.fieldGroup}>
+              <label htmlFor="date">Date</label>
+              <input
+                id="date"
+                name="date"
+                type="date"
+                value={formData.date}
                 onChange={handleChange}
               />
             </div>
 
-            <div className={styles.twoColumn}>
-              <div className={styles.fieldGroup}>
-                <label htmlFor="date">Date</label>
-                <input
-                  id="date"
-                  name="date"
-                  type="date"
-                  value={formData.date}
-                  onChange={handleChange}
-                />
-              </div>
+            <div className={styles.fieldGroup}>
+              <div className={styles.twoColumn}>
+                <div className={styles.fieldGroup}>
+                  <label htmlFor="startTime">Start time</label>
+                  <div className={styles.timeField}>
+                    <input
+                      id="startTime"
+                      name="startTime"
+                      type="time"
+                      value={formData.startTime}
+                      onChange={handleChange}
+                      required
+                    />
+                    <ClockIcon />
+                  </div>
+                </div>
 
-              <div className={styles.fieldGroup}>
-                <label htmlFor="timeRange">Time Range</label>
-                <input
-                  id="timeRange"
-                  name="timeRange"
-                  type="text"
-                  placeholder="10:00 AM - 8:00 PM"
-                  value={formData.timeRange}
-                  onChange={handleChange}
-                />
+                <div className={styles.fieldGroup}>
+                  <label htmlFor="endTime">End time</label>
+                  <div className={styles.timeField}>
+                    <input
+                      id="endTime"
+                      name="endTime"
+                      type="time"
+                      value={formData.endTime}
+                      onChange={handleChange}
+                      required
+                    />
+                    <ClockIcon />
+                  </div>
+                </div>
               </div>
+              {timeError && <p className={styles.fieldError}>{timeError}</p>}
             </div>
 
             <div className={styles.twoColumn}>
@@ -471,9 +584,13 @@ export default function HomePage() {
               <button
                 type="submit"
                 className={styles.primaryButton}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isValidatingLocation}
               >
-                {isSubmitting ? "Preparing..." : "Generate Itinerary"}
+                {isValidatingLocation
+                  ? "Checking location..."
+                  : isSubmitting
+                    ? "Preparing..."
+                    : "Generate Itinerary"}
               </button>
             </div>
           </form>

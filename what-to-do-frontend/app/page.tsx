@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import styles from "./page.module.css";
 import { useAuth } from "./contexts/AuthContext";
+import LocationAutocomplete from "./components/LocationAutocomplete";
+import { formatPlace, pickMatch, searchPlaces } from "./lib/geocoding";
 
 const API_BASE_URL = "/api";
 const ITINERARY_STORAGE_KEY = "planner_home_itinerary";
@@ -87,6 +89,7 @@ type PersistedHomeState = {
   result: ItineraryResponse | null;
   savedActivityIds: string[];
   savedRecordIds: Record<string, number>;
+  locationValid?: boolean;
 };
 
 const initialFormData: PlannerFormData = {
@@ -171,6 +174,9 @@ export default function HomePage() {
     {},
   );
   const [hasHydrated, setHasHydrated] = useState(false);
+  const [locationValid, setLocationValid] = useState(false);
+  const [locationError, setLocationError] = useState("");
+  const [isValidatingLocation, setIsValidatingLocation] = useState(false);
 
   useEffect(() => {
     try {
@@ -183,10 +189,15 @@ export default function HomePage() {
 
       const parsed: PersistedHomeState = JSON.parse(raw);
 
-      setFormData(parsed.formData ?? initialFormData);
+      const restoredFormData = parsed.formData ?? initialFormData;
+
+      setFormData(restoredFormData);
       setResult(parsed.result ?? null);
       setSavedActivityIds(parsed.savedActivityIds ?? []);
       setSavedRecordIds(parsed.savedRecordIds ?? {});
+      setLocationValid(
+        parsed.locationValid ?? Boolean(restoredFormData.location.trim()),
+      );
     } catch (error) {
       console.error("Failed to restore itinerary from sessionStorage:", error);
       sessionStorage.removeItem(ITINERARY_STORAGE_KEY);
@@ -203,10 +214,18 @@ export default function HomePage() {
       result,
       savedActivityIds,
       savedRecordIds,
+      locationValid,
     };
 
     sessionStorage.setItem(ITINERARY_STORAGE_KEY, JSON.stringify(data));
-  }, [hasHydrated, formData, result, savedActivityIds, savedRecordIds]);
+  }, [
+    hasHydrated,
+    formData,
+    result,
+    savedActivityIds,
+    savedRecordIds,
+    locationValid,
+  ]);
 
   function handleChange(
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -225,11 +244,60 @@ export default function HomePage() {
     return `$${price}`;
   }
 
+  async function resolveLocation(): Promise<string | null> {
+    const typed = formData.location.trim();
+
+    if (!typed) {
+      setLocationError("Please enter a location.");
+      return null;
+    }
+
+    if (locationValid) {
+      return typed;
+    }
+
+    setIsValidatingLocation(true);
+
+    try {
+      const results = await searchPlaces(typed);
+      const match = pickMatch(results, typed);
+
+      if (!match) {
+        setLocationError(
+          "That location doesn't seem to exist. Pick one from the suggestions.",
+        );
+        return null;
+      }
+
+      const label = formatPlace(match);
+      setFormData((prev) => ({ ...prev, location: label }));
+      setLocationValid(true);
+      return label;
+    } catch (error) {
+      console.error("Location validation error:", error);
+      setLocationError("Couldn't verify that location. Please try again.");
+      return null;
+    } finally {
+      setIsValidatingLocation(false);
+    }
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setLocationError("");
+
+    const resolvedLocation = await resolveLocation();
+
+    if (!resolvedLocation) {
+      return;
+    }
+
     setIsSubmitting(true);
 
-    const payload = buildRecommendationPayload(formData);
+    const payload = buildRecommendationPayload({
+      ...formData,
+      location: resolvedLocation,
+    });
 
     try {
       const response = await fetch(
@@ -391,14 +459,25 @@ export default function HomePage() {
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.fieldGroup}>
               <label htmlFor="location">Location</label>
-              <input
+              <LocationAutocomplete
                 id="location"
                 name="location"
-                type="text"
-                placeholder="Enter city or area"
+                placeholder="Enter a city (e.g. San Francisco)"
                 value={formData.location}
-                onChange={handleChange}
+                onValueChange={(value) => {
+                  setFormData((prev) => ({ ...prev, location: value }));
+                  setLocationError("");
+                }}
+                onValidChange={setLocationValid}
               />
+              {locationError ? (
+                <p className={styles.fieldError}>{locationError}</p>
+              ) : (
+                locationValid &&
+                formData.location.trim() !== "" && (
+                  <p className={styles.fieldHint}>✓ Verified location</p>
+                )
+              )}
             </div>
 
             <div className={styles.twoColumn}>
@@ -471,9 +550,13 @@ export default function HomePage() {
               <button
                 type="submit"
                 className={styles.primaryButton}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isValidatingLocation}
               >
-                {isSubmitting ? "Preparing..." : "Generate Itinerary"}
+                {isValidatingLocation
+                  ? "Checking location..."
+                  : isSubmitting
+                    ? "Preparing..."
+                    : "Generate Itinerary"}
               </button>
             </div>
           </form>

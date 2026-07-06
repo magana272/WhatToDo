@@ -135,6 +135,20 @@
   gap: 18px;
 }
 
+.fieldError {
+  margin: 0;
+  color: #dc2626;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.fieldHint {
+  margin: 0;
+  color: #059669;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
 .formActions {
   display: flex;
   gap: 14px;

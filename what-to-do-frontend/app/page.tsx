@@ -190,6 +190,7 @@ export default function HomePage() {
   const [locationValid, setLocationValid] = useState(false);
   const [locationError, setLocationError] = useState("");
   const [isValidatingLocation, setIsValidatingLocation] = useState(false);
+  const [timeError, setTimeError] = useState("");
 
   useEffect(() => {
     try {
@@ -202,7 +203,7 @@ export default function HomePage() {
 
       const parsed: PersistedHomeState = JSON.parse(raw);
 
-      const restoredFormData = parsed.formData ?? initialFormData;
+      const restoredFormData = { ...initialFormData, ...(parsed.formData ?? {}) };
 
       setFormData(restoredFormData);
       setResult(parsed.result ?? null);
@@ -297,6 +298,17 @@ export default function HomePage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (
+      formData.startTime &&
+      formData.endTime &&
+      formData.endTime <= formData.startTime
+    ) {
+      setTimeError("End time must be after the start time.");
+      return;
+    }
+
+    setTimeError("");
     setLocationError("");
 
     const resolvedLocation = await resolveLocation();

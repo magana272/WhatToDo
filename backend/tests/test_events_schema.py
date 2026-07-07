@@ -57,6 +57,18 @@ class TestEventRequest:
         with pytest.raises(ValidationError):
             EventRequest(city="Boston")
 
+    def test_budget_bounds(self):
+        assert EventRequest(city="Boston", interests="food", budget=0).budget == 0
+        assert EventRequest(city="Boston", interests="food", budget=10000).budget == 10000
+
+    def test_budget_below_zero_raises(self):
+        with pytest.raises(ValidationError):
+            EventRequest(city="Boston", interests="food", budget=-1)
+
+    def test_budget_above_max_raises(self):
+        with pytest.raises(ValidationError):
+            EventRequest(city="Boston", interests="food", budget=10001)
+
 
 class TestEvent:
     """Tests for the Event response schema."""

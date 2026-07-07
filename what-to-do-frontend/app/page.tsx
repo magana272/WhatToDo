@@ -1,14 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import styles from "./page.module.css";
 import { useAuth } from "./contexts/AuthContext";
 import LocationAutocomplete from "./components/LocationAutocomplete";
+import InterestPicker from "./components/InterestPicker";
 import { formatPlace, pickMatch, searchPlaces } from "./lib/geocoding";
 import { API_BASE_URL } from "./lib/api";
 
 const ITINERARY_STORAGE_KEY = "planner_home_itinerary";
+
+const MIN_BUDGET = 0;
+const MAX_BUDGET = 10000;
+const BUDGET_MAX_CENTS = MAX_BUDGET * 100;
 
 const features = [
   "Smart recommendations",
@@ -24,7 +29,7 @@ type PlannerFormData = {
   endTime: string;
   budget: string;
   preference: string;
-  interests: string;
+  interests: string[];
 };
 
 type PlannerRequestPayload = {
@@ -100,7 +105,7 @@ const initialFormData: PlannerFormData = {
   endTime: "18:00",
   budget: "",
   preference: "Mixed",
-  interests: "",
+  interests: [],
 };
 
 function getAuthHeaders(token: string | null): Record<string, string> {
@@ -113,12 +118,27 @@ function getAuthHeaders(token: string | null): Record<string, string> {
   };
 }
 
+function formatUSD(amount: number): string {
+  return amount.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+}
+
+function formatUSDWhole(amount: number): string {
+  return amount.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+}
+
 function buildRecommendationPayload(
   formData: PlannerFormData,
 ): PlannerRequestPayload {
   return {
     city: formData.location.trim(),
-    interests: formData.interests.trim(),
+    interests: formData.interests.join(", "),
     budget: formData.budget === "" ? 0 : Number(formData.budget),
     dateRange: formData.date,
     dayStartTime: formData.startTime,
@@ -176,6 +196,28 @@ function ClockIcon() {
   );
 }
 
+function ChevronIcon() {
+  return (
+    <svg
+      className={styles.selectIcon}
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="m6 9 6 6 6-6"
+      />
+    </svg>
+  );
+}
+
 export default function HomePage() {
   const { isLoggedIn, isLoading, token } = useAuth();
 
@@ -191,6 +233,8 @@ export default function HomePage() {
   const [locationError, setLocationError] = useState("");
   const [isValidatingLocation, setIsValidatingLocation] = useState(false);
   const [timeError, setTimeError] = useState("");
+  const [budgetCapped, setBudgetCapped] = useState(false);
+  const budgetFlashRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     try {
@@ -204,6 +248,16 @@ export default function HomePage() {
       const parsed: PersistedHomeState = JSON.parse(raw);
 
       const restoredFormData = { ...initialFormData, ...(parsed.formData ?? {}) };
+
+      if (!Array.isArray(restoredFormData.interests)) {
+        const legacy = restoredFormData.interests as unknown as string;
+        restoredFormData.interests = legacy
+          ? legacy
+              .split(",")
+              .map((item) => item.trim())
+              .filter(Boolean)
+          : [];
+      }
 
       setFormData(restoredFormData);
       setResult(parsed.result ?? null);
@@ -241,6 +295,14 @@ export default function HomePage() {
     locationValid,
   ]);
 
+  useEffect(() => {
+    return () => {
+      if (budgetFlashRef.current) {
+        clearTimeout(budgetFlashRef.current);
+      }
+    };
+  }, []);
+
   function handleChange(
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) {
@@ -250,6 +312,36 @@ export default function HomePage() {
       ...prev,
       [name]: value,
     }));
+  }
+
+  function flashBudgetCap() {
+    setBudgetCapped(true);
+    if (budgetFlashRef.current) {
+      clearTimeout(budgetFlashRef.current);
+    }
+    budgetFlashRef.current = setTimeout(() => setBudgetCapped(false), 700);
+  }
+
+  function handleBudgetChange(event: ChangeEvent<HTMLInputElement>) {
+    const digits = event.target.value.replace(/\D/g, "");
+
+    if (digits === "") {
+      setFormData((prev) => ({ ...prev, budget: "" }));
+      return;
+    }
+
+    let cents = parseInt(digits, 10);
+
+    if (cents > BUDGET_MAX_CENTS) {
+      cents = BUDGET_MAX_CENTS;
+      flashBudgetCap();
+    }
+
+    setFormData((prev) => ({ ...prev, budget: (cents / 100).toFixed(2) }));
+  }
+
+  function setInterests(next: string[]) {
+    setFormData((prev) => ({ ...prev, interests: next }));
   }
 
   function formatPrice(price: number | null) {
@@ -553,42 +645,61 @@ export default function HomePage() {
 
             <div className={styles.twoColumn}>
               <div className={styles.fieldGroup}>
-                <label htmlFor="budget">Budget</label>
+                <label htmlFor="budget">
+                  Budget
+                  <span
+                    className={
+                      budgetCapped
+                        ? `${styles.labelHint} ${styles.labelHintInvalid}`
+                        : styles.labelHint
+                    }
+                  >
+                    Between {formatUSDWhole(MIN_BUDGET)}–
+                    {formatUSDWhole(MAX_BUDGET)}
+                  </span>
+                </label>
                 <input
                   id="budget"
                   name="budget"
-                  type="number"
-                  placeholder="50"
-                  min="0"
-                  value={formData.budget}
-                  onChange={handleChange}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder={formatUSD(0)}
+                  className={budgetCapped ? styles.inputInvalid : undefined}
+                  value={
+                    formData.budget === ""
+                      ? ""
+                      : formatUSD(Number(formData.budget))
+                  }
+                  onChange={handleBudgetChange}
+                  aria-invalid={budgetCapped}
                 />
               </div>
 
               <div className={styles.fieldGroup}>
                 <label htmlFor="preference">Preference</label>
-                <select
-                  id="preference"
-                  name="preference"
-                  value={formData.preference}
-                  onChange={handleChange}
-                >
-                  <option>Indoor</option>
-                  <option>Outdoor</option>
-                  <option>Mixed</option>
-                </select>
+                <div className={styles.selectField}>
+                  <select
+                    id="preference"
+                    name="preference"
+                    value={formData.preference}
+                    onChange={handleChange}
+                  >
+                    <option>Indoor</option>
+                    <option>Outdoor</option>
+                    <option>Mixed</option>
+                  </select>
+                  <ChevronIcon />
+                </div>
               </div>
             </div>
 
             <div className={styles.fieldGroup}>
               <label htmlFor="interests">Interests</label>
-              <input
+              <InterestPicker
                 id="interests"
-                name="interests"
-                type="text"
-                placeholder="Food, art, music, nature"
                 value={formData.interests}
-                onChange={handleChange}
+                placeholder="Type to search — e.g. food, art, live music"
+                onChange={setInterests}
               />
             </div>
 

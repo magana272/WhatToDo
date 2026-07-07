@@ -1,5 +1,5 @@
 """Schemas for planner endpoint."""
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from .events import  EventResponse
 
 class PlannerRequest(BaseModel):
@@ -7,7 +7,7 @@ class PlannerRequest(BaseModel):
     location: str
     date: str
     timeRange: str
-    budget: float | None = None
+    budget: float | None = Field(None, ge=0, le=10000)
     preference: str | None = None
     interests: list[str]
 

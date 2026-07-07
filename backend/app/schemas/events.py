@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 class EventRequest(BaseModel):
     city: str = Field(..., description="City to search events in")
     interests: str = Field(..., description="User interests or event type")
-    budget: float | None = Field(None, description="Max budget in USD per person")
+    budget: float | None = Field(None, ge=0, le=10000, description="Max budget in USD per person")
     date_range: str | None = Field(None, description="Preferred date range, e.g. '2026-03-15 to 2026-03-20'")
     day_start_time: str | None = Field(None, description="Preferred start time of day: '09:00', '9AM', '9:30pm'") # 9m, 12pm?
     day_end_time: str | None = Field(None, description="Preferred end time of day: '21:00', '9PM', '9:30pm'") # 9pm, 2am?

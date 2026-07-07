@@ -149,6 +149,45 @@
   font-weight: 600;
 }
 
+.labelHint {
+  margin-left: 8px;
+  color: #64748b;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.labelHintInvalid {
+  color: #dc2626;
+}
+
+.inputInvalid,
+.inputInvalid:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.14);
+}
+
+.selectField {
+  position: relative;
+}
+
+.selectField select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 44px;
+  cursor: pointer;
+}
+
+.selectIcon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  pointer-events: none;
+}
+
 .timeField {
   position: relative;
 }

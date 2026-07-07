@@ -11,7 +11,8 @@ export default function MainNav() {
     <header className={styles.header}>
       <div className={styles.inner}>
         <Link href="/" className={styles.brand}>
-          What To Do
+          <span className={styles.mark} aria-hidden="true" />
+          <span className={styles.brandName}>What To Do</span>
         </Link>
 
         <nav className={styles.nav}>

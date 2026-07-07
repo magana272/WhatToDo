@@ -1,8 +1,8 @@
 .page {
   min-height: 100vh;
-  max-width: 1200px;
+  max-width: var(--maxw);
   margin: 0 auto;
-  padding: 56px 24px 96px;
+  padding: 56px 40px 96px;
 }
 
 .headerSection {
@@ -11,49 +11,47 @@
 
 .eyebrow {
   margin: 0 0 12px;
-  color: #6366f1;
-  font-weight: 800;
+  color: var(--color-accent);
+  font-weight: var(--fw-semibold);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.82rem;
+  letter-spacing: var(--tracking-wide);
+  font-size: var(--fs-xs);
 }
 
 .title {
   margin: 0;
-  font-size: clamp(2.3rem, 5vw, 4rem);
-  line-height: 1.02;
-  letter-spacing: -0.04em;
-  color: #0f172a;
+  font-size: var(--fs-display);
+  line-height: var(--lh-tight);
+  color: var(--color-text);
 }
 
 .subtitle {
-  margin-top: 16px;
-  color: #64748b;
-  line-height: 1.8;
-  font-size: 1.05rem;
+  margin-top: 18px;
+  color: var(--color-text-muted);
+  line-height: var(--lh-normal);
+  font-size: var(--fs-md);
 }
 
 .contentGrid {
   display: grid;
   grid-template-columns: 320px 1fr;
   gap: 24px;
-  margin-top: 36px;
+  margin-top: 40px;
   align-items: start;
 }
 
 .filterCard,
 .listSection {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 28px;
+  background: var(--color-surface);
+  border: var(--border);
+  border-radius: var(--radius);
   padding: 24px;
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.04);
 }
 
 .filterTitle {
   margin: 0 0 18px;
-  color: #0f172a;
-  font-size: 1.2rem;
+  color: var(--color-text);
+  font-size: var(--fs-md);
 }
 
 .fieldGroup {
@@ -63,50 +61,51 @@
 }
 
 .fieldGroup label {
-  font-size: 0.94rem;
-  font-weight: 700;
-  color: #334155;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text);
 }
 
 .fieldGroup input,
 .fieldGroup select {
   width: 100%;
-  border: 1px solid rgba(15, 23, 42, 0.1);
-  border-radius: 16px;
-  padding: 13px 14px;
-  font-size: 0.98rem;
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: var(--fs-base);
   outline: none;
-  background: white;
-  color: #0f172a;
+  background: var(--color-surface);
+  color: var(--color-text);
   transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .fieldGroup input:focus,
 .fieldGroup select:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+  border-color: var(--color-accent);
+  box-shadow: var(--focus-ring);
 }
 
 .resetButton {
   width: 100%;
   margin-top: 20px;
-  border: 1px solid rgba(15, 23, 42, 0.1);
-  border-radius: 999px;
-  padding: 13px 16px;
-  background: white;
-  color: #0f172a;
-  font-weight: 700;
+  border: var(--border-strong);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
   transition:
-    transform 0.2s ease,
-    background 0.2s ease;
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .resetButton:hover {
-  transform: translateY(-1px);
-  background: #f8fafc;
+  background: var(--color-text);
+  color: var(--color-surface);
 }
 
 .resultsHeader {
@@ -119,26 +118,26 @@
 
 .resultsHeader h2 {
   margin: 0;
-  color: #0f172a;
-  font-size: 1.3rem;
+  color: var(--color-text);
+  font-size: var(--fs-md);
 }
 
 .resultsCount {
-  color: #64748b;
-  font-size: 0.94rem;
-  font-weight: 600;
+  color: var(--color-text-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
 }
 
 .cardList {
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .card {
-  background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 24px;
-  padding: 22px;
+  background: var(--color-surface);
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
 }
 
 .cardTop {
@@ -150,96 +149,83 @@
 
 .cardTop h3 {
   margin: 0;
-  color: #0f172a;
-  font-size: 1.15rem;
+  color: var(--color-text);
+  font-size: var(--fs-md);
 }
 
 .summary {
   margin: 10px 0 0;
-  color: #64748b;
-  line-height: 1.7;
+  color: var(--color-text-muted);
+  line-height: var(--lh-normal);
 }
 
 .statusTag {
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: #eef2ff;
-  color: #4338ca;
-  font-size: 0.88rem;
-  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
 }
 
 .metaRow {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
   margin-top: 18px;
 }
 
 .metaPill {
   display: inline-flex;
   align-items: center;
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: #f8fafc;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  color: #334155;
-  font-size: 0.92rem;
-  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  border: var(--border);
+  color: var(--color-text);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
 }
 
 .emptyState {
-  border: 1px dashed rgba(15, 23, 42, 0.14);
-  border-radius: 24px;
-  padding: 32px 20px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+  padding: 40px 24px;
   text-align: center;
-  background: #ffffff;
+  background: var(--color-surface);
 }
 
 .emptyState h3 {
   margin: 0;
-  color: #0f172a;
+  color: var(--color-text);
+  font-size: var(--fs-md);
 }
 
 .emptyState p {
   margin: 10px 0 0;
-  color: #64748b;
-}
-
-@media (max-width: 980px) {
-  .contentGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 700px) {
-  .page {
-    padding: 28px 16px 64px;
-  }
-
-  .filterCard,
-  .listSection {
-    padding: 20px;
-    border-radius: 24px;
-  }
-
-  .cardTop,
-  .resultsHeader {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+  color: var(--color-text-muted);
 }
 
 .deleteButton {
-  border: 1px solid #e5e7eb;
-  background: white;
-  color: #b91c1c;
-  border-radius: 10px;
+  border: var(--border);
+  background: var(--color-surface);
+  color: var(--color-danger);
+  border-radius: var(--radius);
   padding: 8px 12px;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.deleteButton:hover {
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
 }
 
 .deleteButton:disabled {
@@ -255,30 +241,50 @@
 }
 
 .downloadButton {
-  border: 1px solid #d0d5dd;
-  background: white;
-  color: #344054;
-  border-radius: 10px;
+  border: var(--border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-radius: var(--radius);
   padding: 8px 12px;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
-  font: inherit;
   transition:
-    background 0.2s ease,
-    transform 0.2s ease,
-    border-color 0.2s ease;
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .downloadButton:hover {
-  background: #f8fafc;
-  transform: translateY(-1px);
-}
-
-.downloadButton:active {
-  transform: translateY(0);
+  background: var(--color-text);
+  border-color: var(--color-text);
+  color: var(--color-surface);
 }
 
 .downloadButton:focus-visible {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+  border-color: var(--color-accent);
+  box-shadow: var(--focus-ring);
+}
+
+@media (max-width: 980px) {
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding: 28px 20px 64px;
+  }
+
+  .filterCard,
+  .listSection {
+    padding: 20px;
+  }
+
+  .cardTop,
+  .resultsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

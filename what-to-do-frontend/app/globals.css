@@ -1,3 +1,54 @@
+:root {
+  --font-body:
+    var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display:
+    var(--font-space-grotesk), system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-bg: #faf9f6;
+  --color-surface: #ffffff;
+  --color-surface-glass: rgba(255, 255, 255, 0.72);
+  --color-text: #111111;
+  --color-text-muted: #6b6b6b;
+  --color-border: #e6e3db;
+  --color-border-strong: #111111;
+
+  --color-accent: #ff5a1f;
+  --color-accent-strong: #e0440c;
+  --color-accent-soft: #fff1ea;
+
+  --color-danger: #c8321f;
+  --color-danger-soft: #fdeeeb;
+  --color-success: #1f7a4d;
+  --color-success-soft: #eef7f1;
+
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-base: 1rem;
+  --fs-md: 1.25rem;
+  --fs-lg: 1.75rem;
+  --fs-xl: 2.5rem;
+  --fs-display: clamp(2.75rem, 6vw, 4.5rem);
+
+  --lh-tight: 1.05;
+  --lh-snug: 1.3;
+  --lh-normal: 1.6;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --tracking-tight: -0.02em;
+  --tracking-wide: 0.14em;
+
+  --radius: 0px;
+  --border: 1px solid var(--color-border);
+  --border-strong: 1px solid var(--color-border-strong);
+  --focus-ring: 0 0 0 3px rgba(255, 90, 31, 0.28);
+
+  --maxw: 1200px;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -10,26 +61,32 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background:
-    radial-gradient(
-      circle at top left,
-      rgba(99, 102, 241, 0.1),
-      transparent 28%
-    ),
-    radial-gradient(
-      circle at top right,
-      rgba(168, 85, 247, 0.08),
-      transparent 30%
-    ),
-    linear-gradient(180deg, #f8fbff 0%, #f8fafc 100%);
-  color: #0f172a;
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: var(--lh-normal);
+  background: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
   min-height: 100vh;
 }
 
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--lh-snug);
+}
+
 a {
   color: inherit;
+}
+
+button {
+  font-family: inherit;
 }

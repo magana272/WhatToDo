@@ -8,50 +8,50 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  min-height: 52px;
-  border: 1px solid rgba(15, 23, 42, 0.1);
-  border-radius: 18px;
-  padding: 10px 14px;
-  background: white;
+  min-height: 50px;
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: 9px 12px;
+  background: var(--color-surface);
   transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .control:focus-within {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+  border-color: var(--color-accent);
+  box-shadow: var(--focus-ring);
 }
 
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: #eef2ff;
-  color: #3730a3;
-  font-size: 0.9rem;
-  font-weight: 600;
+  padding: 5px 8px;
+  border-radius: var(--radius);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
 }
 
 .chipRemove {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: transparent;
-  color: #4f46e5;
-  font-size: 1.1rem;
+  color: var(--color-accent-strong);
+  font-size: var(--fs-base);
   line-height: 1;
   cursor: pointer;
 }
 
 .chipRemove:hover {
-  background: rgba(79, 70, 229, 0.16);
+  background: rgba(224, 68, 12, 0.16);
 }
 
 .input {
@@ -60,9 +60,9 @@
   border: none;
   outline: none;
   padding: 6px 0;
-  font-size: 1rem;
+  font-size: var(--fs-base);
   background: transparent;
-  color: #0f172a;
+  color: var(--color-text);
 }
 
 .dropdown {
@@ -72,33 +72,32 @@
   right: 0;
   z-index: 30;
   margin: 0;
-  padding: 6px;
+  padding: 4px;
   list-style: none;
-  background: white;
-  border: 1px solid rgba(15, 23, 42, 0.1);
-  border-radius: 16px;
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.14);
+  background: var(--color-surface);
+  border: var(--border-strong);
+  border-radius: var(--radius);
   max-height: 264px;
   overflow-y: auto;
 }
 
 .option {
   padding: 10px 12px;
-  border-radius: 12px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #0f172a;
+  border-radius: var(--radius);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--color-text);
   cursor: pointer;
 }
 
 .option:hover,
 .optionActive {
-  background: #eef2ff;
+  background: var(--color-accent-soft);
 }
 
 .duplicate {
   margin: 8px 0 0;
-  color: #dc2626;
-  font-size: 0.85rem;
-  font-weight: 600;
+  color: var(--color-danger);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
 }

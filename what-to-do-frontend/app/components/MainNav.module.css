@@ -25,6 +25,7 @@
   gap: 12px;
   color: var(--color-text);
   text-decoration: none;
+  flex: none;
 }
 
 .mark {
@@ -42,10 +43,44 @@
   white-space: nowrap;
 }
 
+.mobileControls {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.mobileUserId {
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+  max-width: 160px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menuButton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: none;
+  border: var(--border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  cursor: pointer;
+  flex: none;
+}
+
 .nav {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 4px;
+  min-width: 0;
 }
 
 .link {
@@ -57,6 +92,7 @@
   font-size: var(--fs-sm);
   font-weight: var(--fw-medium);
   white-space: nowrap;
+  flex: none;
 }
 
 .link:hover {
@@ -68,6 +104,8 @@
   color: var(--color-text-muted);
   padding: 8px 10px;
   max-width: 140px;
+  min-width: 0;
+  flex: 0 1 auto;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -85,6 +123,7 @@
   font-size: var(--fs-sm);
   font-weight: var(--fw-medium);
   white-space: nowrap;
+  flex: none;
 }
 
 .linkButton:hover {
@@ -94,5 +133,47 @@
 @media (max-width: 700px) {
   .inner {
     padding: 16px 20px;
+    gap: 12px;
+  }
+
+  .mobileControls {
+    display: flex;
+  }
+
+  .menuButton {
+    display: inline-flex;
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .userId {
+    display: none;
+  }
+
+  .navOpen {
+    display: flex;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 4px 20px 12px;
+    background: var(--color-surface);
+    border-bottom: var(--border-strong);
+  }
+
+  .navOpen .link,
+  .navOpen .linkButton {
+    padding: 14px 4px;
+    font-size: var(--fs-base);
+    text-align: left;
+  }
+
+  .navOpen > *:not(:last-child) {
+    border-bottom: var(--border);
   }
 }

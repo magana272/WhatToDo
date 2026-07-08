@@ -74,11 +74,11 @@
   background: var(--color-surface);
   border: var(--border-strong);
   border-radius: var(--radius);
-  padding: 28px;
+  padding: 24px;
 }
 
 .formHeader {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .formEyebrow {
@@ -98,7 +98,7 @@
 
 .form {
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .fieldGroup {
@@ -107,6 +107,8 @@
 }
 
 .fieldGroup label {
+  display: flex;
+  align-items: baseline;
   font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
   color: var(--color-text);
@@ -117,7 +119,7 @@
   width: 100%;
   border: var(--border);
   border-radius: var(--radius);
-  padding: 11px 14px;
+  padding: 9px 12px;
   font-size: var(--fs-base);
   outline: none;
   background: var(--color-surface);
@@ -156,8 +158,9 @@
 .labelHint {
   margin-left: 8px;
   color: var(--color-text-muted);
-  font-size: var(--fs-sm);
+  font-size: var(--fs-xs);
   font-weight: var(--fw-regular);
+  white-space: nowrap;
   transition: color 0.15s ease;
 }
 
@@ -459,7 +462,7 @@
   }
 
   .formCard {
-    padding: 24px;
+    padding: 20px;
   }
 
   .primaryButton {

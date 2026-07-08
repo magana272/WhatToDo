@@ -169,3 +169,16 @@ The workflow for deployment includes:
 3. **Frontend Deployment**: A GitHub Actions workflow builds the Next.js static export and publishes it to GitHub Pages on every push to `main`.
 4. **Backend Deployment**: Render builds and deploys the backend from `backend/Dockerfile`.
 5. **Testing**: After deployment, the application is tested to ensure all functionalities work as expected.
+
+---
+
+## Authors
+
+Originally developed as a team project by:
+
+- Manuel Magana
+- Shiqiu Chen
+- Songting Yang
+- Qian Li
+
+Currently maintained by Manuel Magana.

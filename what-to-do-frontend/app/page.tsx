@@ -235,6 +235,8 @@ export default function HomePage() {
   const [timeError, setTimeError] = useState("");
   const [budgetCapped, setBudgetCapped] = useState(false);
   const budgetFlashRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resultSectionRef = useRef<HTMLElement | null>(null);
+  const shouldScrollToResultRef = useRef(false);
 
   useEffect(() => {
     try {
@@ -302,6 +304,18 @@ export default function HomePage() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!result || !shouldScrollToResultRef.current) {
+      return;
+    }
+
+    shouldScrollToResultRef.current = false;
+    resultSectionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, [result]);
 
   function handleChange(
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -442,6 +456,7 @@ export default function HomePage() {
       const data: RecommendationApiItem[] = await response.json();
       const activities = normalizeRecommendations(data);
 
+      shouldScrollToResultRef.current = true;
       setResult(buildResult(payload, activities));
       setSavedActivityIds([]);
       setSavedRecordIds({});
@@ -721,7 +736,7 @@ export default function HomePage() {
       </section>
 
       {result && (
-        <section className={styles.resultSection}>
+        <section className={styles.resultSection} ref={resultSectionRef}>
           <div className={styles.resultHeader}>
             <p className={styles.formEyebrow}>Generated Itinerary</p>
             <h2 className={styles.resultTitle}>{result.title}</h2>

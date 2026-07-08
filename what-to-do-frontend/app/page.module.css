@@ -1,6 +1,6 @@
 .page {
   min-height: 100vh;
-  padding: 56px 40px 96px;
+  padding: 32px 40px 96px;
   max-width: var(--maxw);
   margin: 0 auto;
 }
@@ -10,7 +10,7 @@
   grid-template-columns: 1.05fr 0.85fr;
   gap: 72px;
   align-items: start;
-  padding-top: 40px;
+  padding-top: 20px;
 }
 
 .heroContent {
@@ -74,11 +74,11 @@
   background: var(--color-surface);
   border: var(--border-strong);
   border-radius: var(--radius);
-  padding: 36px;
+  padding: 28px;
 }
 
 .formHeader {
-  margin-bottom: 28px;
+  margin-bottom: 20px;
 }
 
 .formEyebrow {
@@ -98,12 +98,12 @@
 
 .form {
   display: grid;
-  gap: 22px;
+  gap: 16px;
 }
 
 .fieldGroup {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .fieldGroup label {
@@ -117,7 +117,7 @@
   width: 100%;
   border: var(--border);
   border-radius: var(--radius);
-  padding: 13px 14px;
+  padding: 11px 14px;
   font-size: var(--fs-base);
   outline: none;
   background: var(--color-surface);
@@ -223,7 +223,7 @@
 
 .primaryButton {
   border-radius: var(--radius);
-  padding: 15px 24px;
+  padding: 13px 24px;
   font-size: var(--fs-base);
   font-weight: var(--fw-bold);
   cursor: pointer;
@@ -247,6 +247,7 @@
   margin-top: 80px;
   display: grid;
   gap: 20px;
+  scroll-margin-top: 88px;
 }
 
 .resultHeader {

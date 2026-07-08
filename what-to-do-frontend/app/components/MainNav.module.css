@@ -39,6 +39,7 @@
   font-size: var(--fs-base);
   font-weight: var(--fw-bold);
   letter-spacing: var(--tracking-tight);
+  white-space: nowrap;
 }
 
 .nav {
@@ -55,6 +56,7 @@
   transition: color 0.15s ease;
   font-size: var(--fs-sm);
   font-weight: var(--fw-medium);
+  white-space: nowrap;
 }
 
 .link:hover {
@@ -82,6 +84,7 @@
   transition: color 0.15s ease;
   font-size: var(--fs-sm);
   font-weight: var(--fw-medium);
+  white-space: nowrap;
 }
 
 .linkButton:hover {

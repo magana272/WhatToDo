@@ -1,21 +1,31 @@
 # What To Do
 
-## CS5500 – Foundations of Software Engineering  
-Final Project Proposal
-
-### Team Members
-- Shiqiu Chen
-- Songting Yang
-- Manuel Magana
-- Qian Li
-
----
-
 ## Project Overview
 
 **What To Do** is an AI-powered activity planning system that helps users quickly decide how to spend their free time. Instead of manually searching across multiple platforms such as event websites, maps, social media, and calendars, the system generates personalized activity recommendations and structured schedules based on user preferences.
 
 The goal is to reduce decision fatigue and make planning faster by combining AI-powered intent detection, event discovery, and calendar integration.
+
+- **Live app:** https://magana272.github.io/WhatToDo/
+
+---
+
+## Screenshots
+
+### Home – Create Your Plan
+Users enter their location, date, time window, budget, preference (indoor/outdoor/mixed), and interests to generate an itinerary.
+
+![Home page with the Create Your Plan form](img/Home.png)
+
+### Generated Itinerary
+The system returns a personalized, time-ordered list of real activities with locations, descriptions, and links. Individual activities can be saved.
+
+![Generated itinerary results page](img/Results.png)
+
+### Saved Plans
+Previously generated itineraries can be browsed, filtered by keyword or preference, downloaded as ICS calendar files, or deleted.
+
+![Saved plans page with filters and ICS download](img/SavedItin.png)
 
 ---
 
@@ -78,20 +88,37 @@ The system includes the following components:
 
 ---
 
+## Repository Structure
+
+```
+.
+├── backend/                # FastAPI backend (routers, services, models, tests)
+├── what-to-do-frontend/    # Next.js frontend
+├── img/                    # Application screenshots used in this README
+└── README.md
+```
+
+See `backend/README.md` and `what-to-do-frontend/README.md` for setup and run instructions for each component.
+
+---
+
 ## Technology Stack
 
 ### Frontend
-- React.js
-- Tailwind CSS or Material UI
+- Next.js (React 19, TypeScript)
+- Tailwind CSS v4
+- Deployed as a static export on GitHub Pages
 
 ### Backend
-- Node.js or Python with FastAPI
-- PostgreSQL
-- AWS RDS for database hosting
-- AWS SES for email services
+- Python with FastAPI
+- SQLAlchemy ORM (SQLite by default, PostgreSQL supported)
+- JWT-based authentication
+- Optional SMTP email for password resets
+- Docker, deployed on Render
+- pytest for testing
 
 ### AI Engine
-- OpenAI API (or equivalent LLM)
+- OpenAI and Anthropic APIs for intent detection, activity discovery, and itinerary generation
 
 ---
 
@@ -133,30 +160,12 @@ User inputs such as location and preferences should be protected and not stored 
 
 ---
 
-## Development Timeline
-
-### Week 6
-Requirements finalization and UI design
-
-### Week 7 – Week 12
-Backend setup and external API integration
-
-### Week 13
-Testing and improvements
-
-### Week 14
-Deployment and final documentation/demo
-
-**Total Estimated Time:** 9 weeks
-
 # Deployment Details
-The application API is hosted on AWS apprunner, and the frontend is hosted on Vercel. The backend API is accessible at `https://mk2tba6npp.us-east-1.awsapprunner.com`, and the frontend is accessible at `https://cs-5500-final-project-seven.vercel.app/`. The database is hosted on AWS RDS, and the email service is configured using AWS SES.
-
-
-
+The backend API is hosted on Render and accessible at `https://whattodo-uc1a.onrender.com`. The frontend is a static Next.js export deployed to GitHub Pages at `https://magana272.github.io/WhatToDo/`.
 
 The workflow for deployment includes:
 1. **Development**: Code is developed locally and pushed to GitHub.
-2. **CI/CD**: GitHub Actions are set up to automatically pushes the image to AWS ECR. The image must be deployed manually to AWS App Runner.
-3. **Frontend Deployment**: The frontend is deployed to Vercel, which automatically builds and deploys the application when changes are pushed to the main branch.
-4. **Testing**: After deployment, the application is tested to ensure all functionalities work as expected.
+2. **CI**: GitHub Actions run backend lint and tests on every push and pull request to `main`.
+3. **Frontend Deployment**: A GitHub Actions workflow builds the Next.js static export and publishes it to GitHub Pages on every push to `main`.
+4. **Backend Deployment**: Render builds and deploys the backend from `backend/Dockerfile`.
+5. **Testing**: After deployment, the application is tested to ensure all functionalities work as expected.
